@@ -1,7 +1,8 @@
 readCh_adj_Sim<-function(){
-  read_tsv('tab_SimCh_3.txt', col_types = cols(chr = col_character())) -> DifEct_Ir
+  library(tidyverse)
+  read_tsv('tab_SimCh_3.txt', col_types = cols(chr = col_character())) -> Sim_Ir
   #tab_SimCh_3
-  DifEct_Ir %>%
+  Sim_Ir %>%
     rename(gene=Row)->DifEct_Ir
-  DifEct_Ir
+  Sim_Ir
 }
