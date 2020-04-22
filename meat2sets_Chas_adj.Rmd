@@ -163,7 +163,7 @@ DifMes_NPSB%>%
 Sim_NPSB <- ss[[4]]
 Sim_NPSB%>%
     rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Sim_NPSB
-Sim_NPSB
+#Sim_NPSB
 Comm_notCha <-ss[[5]]
 Comm_notCha%>%
     rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Comm_notCha_NPSB
@@ -229,52 +229,5 @@ Sim_NPSB_mtlb_Cha %>%
   write_tsv("Sim_NPSB_mtlb_Cha.txt")
 
 ```
-
-- write DEG_high sets (and Com_notHigh )
-```{r}
-DifEct_Ch %>%
-  write_tsv("DifEct_high.txt")
-
-DifEnd_Ch %>%
-  write_tsv("DifEnd_high.txt")
-
-DifMes_Ch %>%
-  write_tsv("DifMes_high.txt")
-
-Comm_notH %>%
-  write_tsv("Comm_notHigh.txt")
-
-Sim_new %>%
-  write_tsv("Sim_newPSB.txt")
-
-```
-- intersect old new Sim values (genes were obtained from Chr2018 main raw set)
-```{r}
-Sim_new %>%
-  inner_join(Sim_Ir, by = "gene")->ijSim
-ijSim
-
-```
-
--- correlate correspondent values of layers for Sim sets
-
-```{r}
-
-cor(ijSim$ecto.x, ijSim$ecto.y)->RectS
-#RectS
-
-cor(ijSim$endo.x, ijSim$endo.y)->RendS
-#RendS
-
-cor(ijSim$meso.x, ijSim$meso.y)->RmesS
-#RmesS
-
-Rs=c(RectS,RectS,RectS)
-
-print("Sim from old PBS: corr coeff Sim GE values old vs new PBS=",Rs)
-print(Rs)
-
-```
-
 
 
