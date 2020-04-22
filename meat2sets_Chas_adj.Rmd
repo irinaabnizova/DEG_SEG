@@ -22,36 +22,23 @@ library(purrr)
 param3='Christel NPSB'
 
 source("new_PSB.R")
-main_raw <-new_PSB(param3)
+main_raw <-new_PSB()
 dim (main_raw)->size_mr
 size_mr
 
 #read_tsv("C:/Users/ia1/Documents/R_work/Ect_Mes_DEG/E7_5_pseudobulk_log2CPM_200331.txt", col_types = cols(Chromosome = col_character())) -> expressionRaw
 #expressionRaw
+main_raw
 
 ```
 
-#- Given raw  gene data(expressionRaw): filter it and modify main_raw
-
-```{r}
-
-#--------------------filter new pseudobulk
-
-#expressionRaw %>% 
-#  filter(Chromosome != "ERCC" & Chromosome != "MT" & Chromosome != "Y") %>% 
-#  select(Probe, Chromosome, Start, End, `Probe Strand`, #Ectoderm_counts, Endoderm_counts, 'Mesoderm counts') %>% 
-#  distinct(Probe, .keep_all = T) %>% 
-#  rename(gene = Probe, Strand = 'Probe Strand', Ecto = #Ectoderm_counts, Endo = Endoderm_counts, Meso = 'Mesoderm counts') -> main_raw
-#main_raw
-  
-```
 - read Chasity adjusted (based on OPSB, Irina) unique set
 
 
 ```{r}
 param5="Chastity adj unique"
-source("readCh_adj_Dif_Sim_other.R")
-readCh_adj_Dif_Sim_other()->gcha
+source("readCh_adj_Dif_Sim.R")
+readCh_adj_Dif_Sim()->gcha
 
 ```
 
@@ -79,8 +66,19 @@ sim
 
 
 ```
+- visualise DEG SEG old PSB
+
+```{r}
+source("densityGE_any.R")
+
+DS_oldPSB<-rbind(dect,dend,dmes,sim)
+
+peems <-densityGE_any(DS_oldPSB)
+peems + facet_wrap( ~ set)
 
 
+  
+```
 - extract DEG vectors from DEGs SEGs
   
 ```{r}
@@ -124,6 +122,7 @@ len_Ds
 ```{r}
 
 main_raw %>%
+  rename(strand=Strand)%>%
     mutate(set=case_when(gene %in% DEct_vector ~"DifEc",
                          gene %in% DEnd_vector ~"DifEn",
                          gene %in% DMes_vector ~"DifM",
@@ -164,7 +163,7 @@ DifMes_NPSB%>%
 Sim_NPSB <- ss[[4]]
 Sim_NPSB%>%
     rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Sim_NPSB
-
+Sim_NPSB
 Comm_notCha <-ss[[5]]
 Comm_notCha%>%
     rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Comm_notCha_NPSB
@@ -173,60 +172,63 @@ Comm_notCha%>%
 - Mtalab format
 ```{r}
 DifEct_NPSB%>%
-  select(gene,chr,start,end,ecto,endo,meso)->Mtlb_NPSB_ect_Cha
+  select(gene,chr,start,end,ecto,endo,meso)->DifEct_NPSB_mtlb_Cha
 DifEnd_NPSB%>%
-  select(gene,chr,start,end,ecto,endo,meso)->Mtlb_NPSB_end_Cha
+  select(gene,chr,start,end,ecto,endo,meso)->DifEnd_NPSB_mtlb_Cha
 DifMes_NPSB%>%
-  select(gene,chr,start,end,ecto,endo,meso)->Mtlb_NPSB_mes_Cha
+  select(gene,chr,start,end,ecto,endo,meso)->DifMes_NPSB_mtlb_Cha
  Sim_NPSB%>%
-  select(gene,chr,start,end,ecto,endo,meso)->Mtlb_NPSB_mes_Cha
+  select(gene,chr,start,end,ecto,endo,meso)->Sim_NPSB_mtlb_Cha
      
 
 ```
 
-
-
-visualise new
+ - visualise DEA SEG new PSB
 
 ```{r}
-source("density_DifEct.R")
-pec<-density_DifEct(DifEct_Ch)
-pec 
-#+ facet_wrap( ~ dif)
+source("densityGE_any.R")
 
-source("density_DifEnd.R")
-pen<-density_DifEnd(DifEnd_Ch, param2)
-pen
+EcEnMS<-rbind(DifEct_NPSB,DifEnd_NPSB,DifMes_NPSB,Sim_NPSB)
 
-source("density_DifMes.R")
-pm<-density_DifMes(DifMes_Ch)
-pm
+pecenms<-densityGE_any(EcEnMS)
+pecenms + facet_wrap( ~ set)
 
-source("density_Sim.R")
-ps<-density_Sim(Sim_new)
-ps
-
-p <- ggarrange(pen,pec,pm,ps,ncol=1, common.legend = TRUE)
-p
-#p + annotate(geom = "text", x = 0, y =0.15, label = paste(param2)) #+ylim(0,1.5)
-  
 
 ```
-- get Matlab format
+- save/write R NSPB format
 ```{r}
 
 
-Mtlb_NPSB_ect %>%
-  write_tsv("Mtlb_NPSB_ect.txt")
+DifMes_NPSB %>%
+  write_tsv("DifMes_NPSB_R_Cha.txt")
 
-Mtlb_NPSB_end %>%
-  write_tsv("Mtlb_NPSB_end.txt")
+DifEnd_NPSB %>%
+  write_tsv("DifEnd_NPSB_R_Cha.txt")
 
-Mtlb_NPSB_mes %>%
-  write_tsv("Mtlb_NPSB_mes.txt")
+DifEct_NPSB %>%
+  write_tsv("DifEct_NPSB_R_Cha.txt")
+
+Sim_NPSB %>%
+  write_tsv("Sim_NPSB_R_Cha.txt")
 
 ```
+- save/write R format
+```{r}
 
+
+DifMes_NPSB_mtlb_Cha %>%
+  write_tsv("DifMes_NPSB_mtlb_Cha.txt")
+
+DifEnd_NPSB_mtlb_Cha %>%
+  write_tsv("DifEnd_NPSB_mtlb_Cha.txt")
+
+DifEct_NPSB_mtlb_Cha %>%
+  write_tsv("DifEct_NPSB_mtlb_Cha.txt")
+
+Sim_NPSB_mtlb_Cha %>%
+  write_tsv("Sim_NPSB_mtlb_Cha.txt")
+
+```
 
 - write DEG_high sets (and Com_notHigh )
 ```{r}
