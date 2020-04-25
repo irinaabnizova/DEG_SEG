@@ -1,5 +1,5 @@
 ---
-title: "Meat to Chastity Adjusted (Irina) DEGs SEGs from NPSB"
+title: "R and Matlab (both NPSB and OSPB 'meat'=GE) Chastity Adjusted (Irina) DEGs SEGs"
 output: html_notebook
 ---
 
@@ -28,11 +28,11 @@ size_mr
 
 #read_tsv("C:/Users/ia1/Documents/R_work/Ect_Mes_DEG/E7_5_pseudobulk_log2CPM_200331.txt", col_types = cols(Chromosome = col_character())) -> expressionRaw
 #expressionRaw
-main_raw
+#main_raw
 
 ```
 
-- read Chasity adjusted (based on OPSB, Irina) unique set
+- read Chasity adjusted (based on OPSB, Irina) unique set, Nav2 from 25 April
 
 
 ```{r}
@@ -74,11 +74,54 @@ source("densityGE_any.R")
 DS_oldPSB<-rbind(dect,dend,dmes,sim)
 
 peems <-densityGE_any(DS_oldPSB)
-peems + facet_wrap( ~ set)
+peems + facet_wrap( ~ set)+ggtitle(" sets with OPSB")
 
 
   
 ```
+- save/write R OSPB format
+```{r}
+
+
+dmes %>%
+  write_tsv("DifMes_OPSB_R_Cha.txt")
+
+dend %>%
+  write_tsv("DifEnd_OPSB_R_Cha.txt")
+
+dect %>%
+  write_tsv("DifEct_OPSB_R_Cha.txt")
+
+sim %>%
+  write_tsv("Sim_OPSB_R_Cha.txt")
+
+
+```
+- save/write standard Matlab format (no 'set' column )
+```{r}
+
+
+dmes %>%
+  select(-set)%>%
+  write_tsv("DifMes_OPSB_mtlb_Cha.txt")
+
+
+dend %>%
+  select(-set)%>%
+  write_tsv("DifEnd_OPSB_mtlb_Cha.txt")
+
+dect %>%
+  select(-set)%>%
+  write_tsv("DifEct_OPSB_mtlb_Cha.txt")
+
+sim %>%
+  select(-set)%>%
+  write_tsv("Sim_OPSB_mtlb_Cha.txt")
+
+```
+
+
+
 - extract DEG vectors from DEGs SEGs
   
 ```{r}
@@ -117,7 +160,7 @@ len_Ds
 
 
 ```
-- collect expression for DEG sets from main_raw data
+- collect expression for DEG sets from main_raw data, NPSB
 
 ```{r}
 
@@ -134,7 +177,7 @@ separated_DS
 
 ```
 
-- split due to set
+- split due to set, new GE from NPSB
 ```{r}
 
   sett<-separated_DS %>%
@@ -169,7 +212,7 @@ Comm_notCha%>%
     rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Comm_notCha_NPSB
 
 ```
-- Mtalab format
+- get Mtalab format NPSB (no 'set')
 ```{r}
 DifEct_NPSB%>%
   select(gene,chr,start,end,ecto,endo,meso)->DifEct_NPSB_mtlb_Cha
@@ -183,7 +226,7 @@ DifMes_NPSB%>%
 
 ```
 
- - visualise DEA SEG new PSB
+ - visualise DEG SEG new PSB
 
 ```{r}
 source("densityGE_any.R")
@@ -191,7 +234,7 @@ source("densityGE_any.R")
 EcEnMS<-rbind(DifEct_NPSB,DifEnd_NPSB,DifMes_NPSB,Sim_NPSB)
 
 pecenms<-densityGE_any(EcEnMS)
-pecenms + facet_wrap( ~ set)
+pecenms + facet_wrap( ~ set) +ggtitle(" with new PSB GE data")
 
 
 ```
@@ -212,7 +255,7 @@ Sim_NPSB %>%
   write_tsv("Sim_NPSB_R_Cha.txt")
 
 ```
-- save/write R format
+- save/write mtlb format NSPB
 ```{r}
 
 

@@ -1,8 +1,10 @@
 readCh_adj_Dif_Sim<-function(){
   
   #C:/Users/ia1/Documents/R_work/Ec_En_M/: they are OPSB-based 2018 expression data
- 
-  read_tsv('tab_DifChEct_3.txt', col_types = cols(chr = col_character())) -> DifEct_Ir
+ #25 April
+  read_tsv('tab_DifChEct_31.txt', col_types = cols(chr = col_character())) -> DifEct_Ir
+  
+  #read_tsv('tab_DifChEct_3.txt', col_types = cols(chr = col_character())) -> DifEct_Ir
     
   DifEct_Ir %>%
     rename(gene=Row)->DifEct_Ir
