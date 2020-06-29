@@ -65,7 +65,7 @@ dmes=gcha[[3]]
 #dmes
 sim=gcha[[4]]
 #sim
-
+dect
 
 ```
 - visualise DEG SEG old PSB
@@ -81,6 +81,25 @@ peems + facet_wrap( ~ set)+ ggtitle(" with old PSB GE")
 
   
 ```
+- box plot per DEG set
+```{r}
+boxplot(dect[6:8])
+```
+
+- paired t-tes
+```{r}
+#------------run paired t0test
+
+t.test(dect$ecto, dect$meso, paired=T)
+
+
+```
+
+- box plots of sets
+```{r}
+boxplot(working.memory[2:3])
+```
+
 - save/write R OSPB format
 ```{r}
 
