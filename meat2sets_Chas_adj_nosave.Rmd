@@ -1,0 +1,275 @@
+---
+title: " GE=Meat to Chastity Adjusted (Irina, OPSB-based) DEGs SEGs from NPSB; (ii) make standart format for both OPSB and NPSB, R Matlab (no set column)"
+output:
+  word_document: default
+  html_notebook: default
+---
+
+libraries
+```{r}
+library(reshape2)
+library(ggplot2)
+library(tidyverse)
+library(gridExtra)
+library(tidyr)
+library(ggpubr)
+#library("readxl")
+library(datasets)  
+library(purrr)
+```
+
+- get new PSB raw data, filtered and modified
+```{r}
+
+param3='Christel NPSB'
+
+source("new_PSB.R")
+main_raw <-new_PSB()
+dim (main_raw)->size_mr
+size_mr
+
+#read_tsv("C:/Users/ia1/Documents/R_work/Ect_Mes_DEG/E7_5_pseudobulk_log2CPM_200331.txt", col_types = cols(Chromosome = col_character())) -> expressionRaw
+#expressionRaw
+#main_raw
+
+```
+
+- read Chasity adjusted (based on OPSB, Irina) unique set
+
+
+```{r}
+param5="Chastity adj unique"
+source("readCh_adj_Dif_Sim.R")
+readCh_adj_Dif_Sim()->gcha
+
+```
+
+
+#- read Dif Christels unique sets, high
+
+```{r}
+#-------------------New Diff Genes: separate Ect 
+#param5='Ch new unique DEGs, high'
+
+#print(param5)
+
+```
+- define in one go from read files
+
+```{r}
+dect=gcha[[1]]
+#dect
+dend=gcha[[2]]
+#dend
+dmes=gcha[[3]]
+#dmes
+sim=gcha[[4]]
+#sim
+
+
+```
+- visualise DEG SEG old PSB
+
+```{r}
+source("densityGE_any.R")
+
+DS_oldPSB<-rbind(dect,dend,dmes,sim)
+
+peems <-densityGE_any(DS_oldPSB)
+peems + facet_wrap( ~ set)+ ggtitle(" with old PSB GE")
+
+
+  
+```
+- save/write R OSPB format
+```{r}
+
+
+dmes %>%
+  write_tsv("DifMes_OPSB_R_Cha.txt")
+
+dend %>%
+  write_tsv("DifEnd_OPSB_R_Cha.txt")
+
+dect %>%
+  write_tsv("DifEct_OPSB_R_Cha.txt")
+
+sim %>%
+  write_tsv("Sim_OPSB_R_Cha.txt")
+
+
+```
+- save/write Matlab format OPSB
+```{r}
+
+
+#dmes %>%
+ # select(-set,-strand)%>%
+ # write_tsv("DifMes_OPSB_mtlb_Cha.txt")
+
+#dend %>%
+ # select(-set,-strand)%>%
+ # write_tsv("DifEnd_OPSB_mtlb_Cha.txt")
+
+#dect %>%
+ # select(-set,-strand)%>%
+ # write_tsv("DifEct_OPSB_mtlb_Cha.txt")
+
+#sim %>%
+ # select(-set,-strand)%>%
+ # write_tsv("Sim_OPSB_mtlb_Cha.txt")
+
+```
+
+- extract DEG vectors from DEGs SEGs to grab  new GE later
+  
+```{r}
+#----------------submit  DEGs, extract dEG vectors
+
+
+dect %>% 
+  distinct(gene) %>% 
+  as_vector() -> DEct_vector
+#DEct_vector
+len_Dec <- length(DEct_vector)
+len_Dec
+
+dend %>% 
+  distinct(gene) %>% 
+  as_vector() -> DEnd_vector
+#DEnd_vector
+len_Den <- length(DEnd_vector)
+len_Den
+
+
+dmes %>% 
+  distinct(gene) %>% 
+  as_vector() -> DMes_vector
+
+len_Dm <- length(DMes_vector)
+len_Dm
+
+#------------------Sim
+sim %>% 
+  distinct(gene) %>% 
+  as_vector() -> Sim_vector
+
+len_Ds <- length(Sim_vector)
+len_Ds
+
+
+```
+- collect expression for DEG sets from main_raw data NPSB
+
+```{r}
+
+main_raw %>%
+  rename(strand=Strand)%>%
+    mutate(set=case_when(gene %in% DEct_vector ~"DifEc",
+                         gene %in% DEnd_vector ~"DifEn",
+                         gene %in% DMes_vector ~"DifM",
+                         gene %in% Sim_vector ~"Sim")
+    )->separated_DS
+
+#separated_DS
+
+
+```
+
+- split due to set
+```{r}
+
+  sett<-separated_DS %>%
+group_by(set)
+
+group_split(sett)->ss
+ss
+
+#--------------------------------
+
+DifEct_NPSB <-ss[[1]]
+DifEct_NPSB %>%
+    rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->DifEct_NPSB
+
+DifEnd_NPSB <-ss[[2]]
+DifEnd_NPSB %>%
+    rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->DifEnd_NPSB
+
+
+DifMes_NPSB <-ss[[3]]
+
+DifMes_NPSB%>%
+  rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->DifMes_NPSB
+
+
+Sim_NPSB <- ss[[4]]
+Sim_NPSB%>%
+    rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Sim_NPSB
+#Sim_NPSB
+Comm_notCha <-ss[[5]]
+Comm_notCha%>%
+    rename(chr=Chromosome,start=Start,end=End,ecto=Ecto, endo=Endo,meso=Meso)->Comm_notCha_NPSB
+
+```
+- Mtalab format OPSB
+```{r}
+DifEct_NPSB%>%
+  select(gene,chr,start,end,ecto,endo,meso)->DifEct_NPSB_mtlb_Cha
+DifEnd_NPSB%>%
+  select(gene,chr,start,end,ecto,endo,meso)->DifEnd_NPSB_mtlb_Cha
+DifMes_NPSB%>%
+  select(gene,chr,start,end,ecto,endo,meso)->DifMes_NPSB_mtlb_Cha
+ Sim_NPSB%>%
+  select(gene,chr,start,end,ecto,endo,meso)->Sim_NPSB_mtlb_Cha
+     
+
+```
+
+ - visualise DEA SEG new PSB
+
+```{r}
+source("densityGE_any.R")
+
+EcEnMS<-rbind(DifEct_NPSB,DifEnd_NPSB,DifMes_NPSB,Sim_NPSB)
+
+pecenms<-densityGE_any(EcEnMS)
+pecenms + facet_wrap( ~ set) + ggtitle(" with new, NPSB GE")
+
+
+```
+- save/write R NSPB format
+```{r}
+
+
+#DifMes_NPSB %>%
+  #write_tsv("DifMes_NPSB_R_Cha.txt")
+
+#DifEnd_NPSB %>%
+  #write_tsv("DifEnd_NPSB_R_Cha.txt")
+
+#DifEct_NPSB %>%
+  #write_tsv("DifEct_NPSB_R_Cha.txt")
+
+#Sim_NPSB %>%
+  #write_tsv("Sim_NPSB_R_Cha.txt")
+
+```
+- save/write mtlb format
+```{r}
+
+
+#DifMes_NPSB_mtlb_Cha %>%
+ # write_tsv("DifMes_NPSB_mtlb_Cha.txt")
+
+#DifEnd_NPSB_mtlb_Cha %>%
+ # write_tsv("DifEnd_NPSB_mtlb_Cha.txt")
+
+#DifEct_NPSB_mtlb_Cha %>%
+ # write_tsv("DifEct_NPSB_mtlb_Cha.txt")
+
+#Sim_NPSB_mtlb_Cha %>%
+  #write_tsv("Sim_NPSB_mtlb_Cha.txt")
+
+```
+
+
