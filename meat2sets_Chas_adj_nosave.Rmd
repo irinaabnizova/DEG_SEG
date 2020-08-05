@@ -1,12 +1,13 @@
 ---
-title: " GE=Meat to Chastity Adjusted (Irina, OPSB-based) DEGs SEGs from NPSB; (ii) make standart format for both OPSB and NPSB, R Matlab (no set column)"
+title: " GE=Meat to Chastity Adjusted (Irina, OPSB-based) DEGs SEGs from NPSB; (ii) make standard format for both OPSB and NPSB DEG and SEG sets, both R & Matlab (no 'set' column for Matlab)"
 output:
   word_document: default
   html_notebook: default
 ---
 
-libraries
+-libraries
 ```{r}
+#sh be installed tidyverse,reshape2,ggplot2,ggpubr
 library(reshape2)
 library(ggplot2)
 library(tidyverse)
@@ -97,24 +98,24 @@ t.test(dect$ecto, dect$meso, paired=T)
 
 - box plots of sets
 ```{r}
-boxplot(working.memory[2:3])
+#boxplot(working.memory[2:3])
 ```
 
 - save/write R OSPB format
 ```{r}
 
 
-dmes %>%
-  write_tsv("DifMes_OPSB_R_Cha.txt")
-
-dend %>%
-  write_tsv("DifEnd_OPSB_R_Cha.txt")
-
-dect %>%
-  write_tsv("DifEct_OPSB_R_Cha.txt")
-
-sim %>%
-  write_tsv("Sim_OPSB_R_Cha.txt")
+# dmes %>%
+#   write_tsv("DifMes_OPSB_R_Cha.txt")
+# 
+# dend %>%
+#   write_tsv("DifEnd_OPSB_R_Cha.txt")
+# 
+# dect %>%
+#   write_tsv("DifEct_OPSB_R_Cha.txt")
+# 
+# sim %>%
+#   write_tsv("Sim_OPSB_R_Cha.txt")
 
 
 ```
@@ -141,6 +142,7 @@ sim %>%
 ```
 
 - extract DEG vectors from DEGs SEGs to grab  new GE later
+ for NPSB
   
 ```{r}
 #----------------submit  DEGs, extract dEG vectors
@@ -195,14 +197,14 @@ main_raw %>%
 
 ```
 
-- split due to set
+- split due to sets with new PSB GE
 ```{r}
 
   sett<-separated_DS %>%
 group_by(set)
 
 group_split(sett)->ss
-ss
+#ss
 
 #--------------------------------
 
