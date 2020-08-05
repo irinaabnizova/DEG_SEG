@@ -1,2 +1,2 @@
 # DEG_SEG
-DEGs and SEGs creation and modification
+DEGs and SEGs filling with OPSB andNPSB GE, and modification
